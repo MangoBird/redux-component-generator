@@ -11,7 +11,7 @@ module.exports = function generateSagas(domain) {
 
   const content = `
   import { put } from 'redux-saga/effects';
-  import { delete${camel}AC, upsert${camel}sAC } from '../actions';
+  import { findAndDelete${camel}AC, upsert${camel}sAC } from '../actions';
   import {
     delete${camel},
     fetch${camel}s,
@@ -19,7 +19,7 @@ module.exports = function generateSagas(domain) {
     put${camel},
     Post${camel}Payload,
     Put${camel}Payload
-  } from '../apis/${lower}sApi';
+  } from '../apis';
   
   export function* post${camel}Saga({ payload }: { payload: Post${camel}Payload }) {
     try {
@@ -63,7 +63,7 @@ module.exports = function generateSagas(domain) {
   export function* delete${camel}Saga({ id }: { id: number }) {
     try {
       yield delete${camel}(id);
-      yield put(delete${camel}AC(id));
+      yield put(findAndDelete${camel}AC(id));
     } catch (err) {
       console.error('delete ${lower} error occurred', err);
     }

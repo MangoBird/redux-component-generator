@@ -17,7 +17,7 @@ module.exports = function generateReducer(domain) {
     DELETE_${upper},
     UPDATE_${upper}S,
     UPSERT_${upper}S
-  } from '../actions/${lower}sActions';
+  } from '../actions';
   
   export interface ${camel} {
     id: number;

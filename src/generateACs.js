@@ -13,8 +13,7 @@ module.exports = function generateACs(domain) {
   // let upper = camel[0].toUpperCase() + camel.slice(1, camel.length);
 
   const content = `
-  import { OpType } from '../../common/utils';
-  import { Post${camel}Payload, Put${camel}Payload } from '../apis/${lower}sApi';
+  import { Post${camel}Payload, Put${camel}Payload } from '../apis';
 
   export const UPDATE_${upper}S = 'UPDATE_${upper}S';
   export const UPSERT_${upper}S = 'UPSERT_${upper}S';
@@ -52,7 +51,7 @@ module.exports = function generateACs(domain) {
     type: FETCH_${upper}S_API
   });
 
-  export const delete${camel}sApiAC = (id: number) => ({
+  export const delete${camel}ApiAC = (id: number) => ({
     type: DELETE_${upper}_API,
     id
   });
