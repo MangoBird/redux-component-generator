@@ -31,6 +31,12 @@ module.exports = function generateReducer(domain) {
   
   export const ${lower}sReducer = (${lower}s = initial${camel}s, action: any) => {
     switch (action.type) {
+      case INIT_${upper}: {
+        return [];
+      }
+      case BULK_INSERT_${upper}: {
+        return [...${lower}s, ...action.${lower}s];
+      }
       case UPSERT_${upper}S: {
         const new${camel}s = upsertImmutably(${lower}s, action.query, action.matcher);
         return new${camel}s;
@@ -64,7 +70,11 @@ module.exports = function generateReducer(domain) {
 
   mkdirp.sync(`${reducerPath}`);
   fs.writeFileSync(`${reducerPath}/${lower}Reducer.ts`, content);
-  fs.appendFileSync(`${reducerPath}/index.ts`, `export * from './${lower}Reducer'`)
+  fs.appendFileSync(`${reducerPath}/index.ts`, `
+  // takeLatest(POST_${upper}_API as any, post${camel}Saga),
+  // takeLatest(FETCH_${upper}S_API as any, fetch${camel}sSaga),
+  // takeLatest(PUT_${upper}_API as any, put${camel}Saga),
+  // takeLatest(DELETE_${upper}_API as any, delete${camel}Saga),`)
 
   return;
 };
