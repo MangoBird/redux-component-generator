@@ -10,53 +10,68 @@ module.exports = function generateSagas(domain) {
   const lower = domain.toLowerCase();
 
   const content = `
+  import _ from 'lodash';
   import { put } from 'redux-saga/effects';
-  import { findAndDelete${camel}AC, upsert${camel}sAC } from '../actions';
+  import { findAndDelete${camel}AC, upsert${camel}sAC, init${camel}s, bulkInsert${camel}s } from '../actions';
   import {
     delete${camel},
     fetch${camel}s,
     post${camel},
     put${camel},
     Post${camel}Payload,
-    Put${camel}Payload
+    Put${camel}Payload,
+    Fetch${camel}Query
   } from '../apis';
-  
-  export function* post${camel}Saga({ payload }: { payload: Post${camel}Payload }) {
+  import { ${camel} } from '../reducers';
+
+  export function* post${camel}Saga({
+    payload,
+    query
+  }: {
+    payload: Post${camel}Payload;
+    query?: Fetch${camel}Query;
+  }) {
     try {
       const { id } = yield post${camel}(payload);
       yield put(
         upsert${camel}sAC({ id }, { id })
       );
-      yield fetch${camel}sSaga();
+      yield fetch${camel}sSaga({ query });
     } catch (err) {
       console.error('post ${lower} error occurred', err);
     }
   }
   
-  export function* fetch${camel}sSaga() {
+  export function* fetch${camel}sSaga(action?: { query?: Fetch${camel}Query) {
+    const query = _.get(action, 'query');
+
     try {
-      const ${lower}sRes = yield fetch${camel}s();
-      for (const { id } of ${lower}sRes) {
-        yield put(
-          upsert${camel}sAC(
-            {
-              id
-            },
-            { id }
-          )
-        );
-      }
+      const { payload: ${lower}sRes, totalCount } = yield fetch${camel}s(query);
+
+      const new${camel}s = ${lower}sRes.map(
+        (${lower}: any): ${camel} => ({})
+      );
+  
+      yield put(init${camel}s());
+      yield put(bulkInsert${camel}s(new${camel}s));
     } catch (err) {
       console.error('fetch ${lower} error occurred', err);
     }
   }
   
-  export function* put${camel}Saga({ payload }: { payload: Put${camel}Payload }) {
+  export function* put${camel}Saga({
+    payload,
+    query
+  }: {
+    payload: Put${camel}Payload;
+    query: Fetch${camel}Query;
+  }) {
     try {
       yield put${camel}(payload);
-      yield fetch${camel}sSaga();
+      yield put(init${camel}s());
+      yield fetch${camel}sSaga({ query });
     } catch (err) {
-      console.error('post ${lower} error occurred', err);
+      console.error('put ${lower} error occurred', err);
     }
   }
   
@@ -72,6 +87,11 @@ module.exports = function generateSagas(domain) {
 
   mkdirp.sync(`${sagasPath}`);
   fs.writeFileSync(`${sagasPath}/${lower}sSagas.ts`, content);
+  fs.appendFileSync(`${sagasPath}/rootSaga.ts`, `
+  // takeLatest(POST_${upper}_API as any, post${camel}Saga),
+  // takeLatest(FETCH_${upper}S_API as any, fetch${camel}sSaga),
+  // takeLatest(PUT_${upper}_API as any, put${camel}Saga),
+  // takeLatest(DELETE_${upper}_API as any, delete${camel}Saga),`)
 
   return;
 };

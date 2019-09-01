@@ -14,7 +14,10 @@ module.exports = function generateReducer(domain) {
   import _ from 'lodash';
   import { findOneAndUpdateImmutably, upsertImmutably } from '../../common/utils';
   import {
+    BULK_INSERT_${upper}S,
+    BULK_UPSERT_${upper}S,
     DELETE_${upper},
+    INIT_${upper}S,
     UPDATE_${upper}S,
     UPSERT_${upper}S
   } from '../actions';
@@ -31,11 +34,22 @@ module.exports = function generateReducer(domain) {
   
   export const ${lower}sReducer = (${lower}s = initial${camel}s, action: any) => {
     switch (action.type) {
-      case INIT_${upper}: {
+      case INIT_${upper}S: {
         return [];
       }
-      case BULK_INSERT_${upper}: {
+      case BULK_INSERT_${upper}S: {
         return [...${lower}s, ...action.${lower}s];
+      }
+      case BULK_UPSERT_${upper}S: {
+        let new${camel}s = ${lower}s;
+  
+        action.${lower}s.forEach((partial${camel}: Partial<${camel}>) => {
+          new${camel}s = upsertImmutably(new${camel}s, partial${camel}, {
+            id: partial${camel}.id
+          });
+        });
+  
+        return new${camel}s;
       }
       case UPSERT_${upper}S: {
         const new${camel}s = upsertImmutably(${lower}s, action.query, action.matcher);
@@ -71,10 +85,6 @@ module.exports = function generateReducer(domain) {
   mkdirp.sync(`${reducerPath}`);
   fs.writeFileSync(`${reducerPath}/${lower}Reducer.ts`, content);
   fs.appendFileSync(`${reducerPath}/index.ts`, `
-  // takeLatest(POST_${upper}_API as any, post${camel}Saga),
-  // takeLatest(FETCH_${upper}S_API as any, fetch${camel}sSaga),
-  // takeLatest(PUT_${upper}_API as any, put${camel}Saga),
-  // takeLatest(DELETE_${upper}_API as any, delete${camel}Saga),`)
-
+export * from './${lower}Reducer';`)
   return;
 };

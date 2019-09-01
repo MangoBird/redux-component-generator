@@ -18,6 +18,7 @@ module.exports = function generateACs(domain) {
 
   export const INIT_${upper}S = 'INIT_${upper}S';
   export const BULK_INSERT_${upper}S = 'BULK_INSERT_${upper}S';
+  export const BULK_UPSERT_${upper}S = 'BULK_UPSERT_${upper}S';
   export const UPDATE_${upper}S = 'UPDATE_${upper}S';
   export const UPSERT_${upper}S = 'UPSERT_${upper}S';
   export const DELETE_${upper} = 'DELETE_${upper}';
@@ -36,6 +37,11 @@ module.exports = function generateACs(domain) {
     ${lower}s
   });  
 
+  export const bulkUpsert${camel}s = (${lower}s: Array<Partial<${camel}>>) => ({
+    type: BULK_UPSERT_${upper}S,
+    ${lower}s
+  });
+
   export const update${camel}sAC = (query: any, matcher: any) => ({
     type: UPDATE_${upper}S,
     query,
@@ -53,14 +59,18 @@ module.exports = function generateACs(domain) {
     id
   });
 
-  export const post${camel}ApiAC = (payload: Post${camel}Payload) => ({
+  export const post${camel}ApiAC = (
+    payload: Post${camel}Payload,
+    query?: Fetch${camel}Query
+  ) => ({
     type: POST_${upper}_API,
-    payload
+    payload,
+    query
   });
 
   export const fetch${camel}sApiAC = (query?: Fetch${camel}Query) => ({
     type: FETCH_${upper}S_API,
-    querys
+    query
   });
 
   export const delete${camel}ApiAC = (id: number) => ({
@@ -68,27 +78,42 @@ module.exports = function generateACs(domain) {
     id
   });
 
-  export const put${camel}ApiAC = (payload: Put${camel}Payload) => ({
+  export const put${camel}ApiAC = (
+    payload: Put${camel}Payload,
+    query: Fetch${camel}Query
+  ) => ({
     type: PUT_${upper}_API,
-    payload
+    payload,
+    query
   });
 
 
+  // import {
+  //   fetch${camel}sApiAC,
+  //   post${camel}ApiAC,
+  //   put${camel}ApiAC
+  // } from '../../redux/actions';
+  // import {
+  //   Fetch${camel}Query,
+  //   Post${camel}Payload,
+  //   Put${camel}Payload
+  // } from '../../redux/apis';
+
   //  interface Props {
   //    dPost${camel}Api: (payload: Post${camel}Payload) => any;
-  //    dFetch${camel}sApi: (query?: string) => any;
-  //    dPut${camel}Api: (payload: Put${camel}Payload) => any;
+  //    dFetch${camel}sApi: (query?: Fetch${camel}Query) => any;
+  //    dPut${camel}Api: (payload: Put${camel}Payload, query?: Fetch${camel}Query) => any;
   //    dDelete${camel}Api: (id: number) => any;
   //    dInit${camel}s: () => any;
   //  }
   //
   //  const mapDispatchToProps = (dispatch: any) => ({
   //    dPost${camel}Api: (payload: Post${camel}Payload) => dispatch(post${camel}ApiAC(payload)),
-  //    dFetch${camel}sApi: (query?: Fetch${camel}Query) => dispatch(fetch${camel}sApiAC(query))
-  //    dPut${camel}Api: (payload: Put${camel}Payload) =>
-  //      dispatch(put${camel}ApiAC(payload))
+  //    dFetch${camel}sApi: (query?: Fetch${camel}Query) => dispatch(fetch${camel}sApiAC(query)),
+  //    dPut${camel}Api: (payload: Put${camel}Payload, query: Fetch${camel}Query) =>
+  //      dispatch(put${camel}ApiAC(payload, query)),
   //    dDelete${camel}Api: (id: number) => dispatch(delete${camel}sApiAC(id)),
-  //  ({
+  //  })
   `;
 
   mkdirp.sync(`${actionCreatorsPath}`);

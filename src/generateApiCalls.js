@@ -16,7 +16,7 @@ module.exports = function generateApiCalls(domain) {
   export interface Fetch${camel}Query {
     where: {};
     limit?: number;
-    skip?: number;
+    offset?: number;
   }
   export const fetch${camel}s = async (query?: Fetch${camel}Query) => {
     const queryStr = encodeURI(parseFetchQueryObj(query));
@@ -37,7 +37,7 @@ module.exports = function generateApiCalls(domain) {
       throw new Error('FETCH_${upper}_FAILED');
     }
   
-    return data.payload;
+    return { payload: data.payload, totalCount: data.totalCount };
   };
   
   export interface Post${camel}Payload {
