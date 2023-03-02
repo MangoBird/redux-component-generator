@@ -11,6 +11,6 @@
   "dependencies": {
     "commander": "^2.20.0",
     "fs": "0.0.1-security",
-    "mkdirp": "^0.5.1"
+    "mkdirp": "^0.5.6"
   }
 }
